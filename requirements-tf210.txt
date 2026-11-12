@@ -1,0 +1,11 @@
+# Worker environment for the TensorFlow 2.10 models (car detector, car colour, nationality
+# age and emotion, category classifier, sign language). Python 3.10 only, Windows.
+# Versions are copied from the working Nationality-Detection virtual environment.
+
+tensorflow==2.10.0
+keras==2.10.0
+numpy==1.23.5
+protobuf==3.19.6
+h5py==3.16.0
+pillow==12.3.0
+opencv-python-headless==4.8.1.78

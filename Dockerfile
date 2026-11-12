@@ -1,0 +1,36 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    KERAS_BACKEND=torch \
+    TF210_PYTHON=/opt/tf210/bin/python \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglib2.0-0 libsndfile1 ffmpeg curl git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install uv
+
+# TensorFlow 2.10 worker environment (Python 3.10)
+COPY requirements-tf210.txt /tmp/requirements-tf210.txt
+RUN uv python install 3.10 && uv venv /opt/tf210 --python 3.10 \
+    && uv pip install --python /opt/tf210/bin/python -r /tmp/requirements-tf210.txt
+
+# Main environment (Keras 3 with torch backend, CPU build of torch)
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu \
+    && pip install -r /tmp/requirements.txt
+
+RUN useradd -m -u 1000 app
+WORKDIR /home/app/project
+COPY --chown=app:app . .
+RUN mkdir -p outputs assets/models && chown -R app:app /home/app \
+    && (test -f assets/models/face_detection_yunet_2023mar.onnx || curl -fsSL -o assets/models/face_detection_yunet_2023mar.onnx \
+        https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx || true)
+USER app
+
+EXPOSE 7860
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0", \
+     "--server.enableXsrfProtection=false", "--server.enableCORS=false", "--server.fileWatcherType=none"]
+

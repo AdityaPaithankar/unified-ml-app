@@ -1,0 +1,17 @@
+# Main environment (Keras 3, torch backend). Do not install TensorFlow here.
+streamlit>=1.40
+streamlit-webrtc
+av
+numpy
+Pillow>=10.0
+pandas
+openpyxl
+opencv-python==4.11.0.86
+keras>=3.3
+ultralytics
+transformers
+speechbrain
+librosa
+soundfile
+
+huggingface_hub>=0.30.0

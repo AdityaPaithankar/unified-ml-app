@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv*/
+.env
+/Car-colour/
+/GEnder -Age/
+/Long-Hair/
+/Nationality/
+/Senior-citizen/
+/Sign Language/
+/VOICE/
+/assets/models/yolov8n.pt
