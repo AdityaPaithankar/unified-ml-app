@@ -1,0 +1,45 @@
+﻿name: Build Unified ML App
+
+on:
+  push:
+    branches:
+      - deploy-clean
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name unifiedmladitya
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t unifiedmladitya.azurecr.io/unified-ml-app:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push unifiedmladitya.azurecr.io/unified-ml-app:${{ github.sha }}
+
+      - name: Confirm image
+        run: |
+          az acr repository show \
+            --name unifiedmladitya \
+            --image unified-ml-app:${{ github.sha }}
+
