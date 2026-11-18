@@ -49,14 +49,18 @@ def remove_quietly(path):
         pass
 
 
-def configure_worker(python_path):
+def configure_worker(python_path=None):
+    python_path = (
+        python_path
+        or os.environ.get("TF210_PYTHON")
+        or ""
+    ).strip()
+
     if python_path:
         os.environ["TF210_PYTHON"] = python_path
         from modules.common import worker_client
 
         worker_client._client.python_path = python_path
-
-
 def worker_is_configured():
     path = os.environ.get("TF210_PYTHON", "")
     return bool(path) and Path(path).is_file()

@@ -11,3 +11,16 @@ __pycache__/
 /Sign Language/
 /VOICE/
 /assets/models/yolov8n.pt
+
+# Backup files
+*.backup
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+

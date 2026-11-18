@@ -23,6 +23,7 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
     && pip install -r /tmp/requirements.txt
 
 RUN useradd -m -u 1000 app
+RUN chown -R app:app /opt/tf210
 WORKDIR /home/app/project
 COPY --chown=app:app . .
 RUN mkdir -p outputs assets/models && chown -R app:app /home/app \
@@ -30,7 +31,9 @@ RUN mkdir -p outputs assets/models && chown -R app:app /home/app \
         https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx || true)
 USER app
 
-EXPOSE 7860
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0", \
+ENV PORT=8080
+EXPOSE 8080
+CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", \
      "--server.enableXsrfProtection=false", "--server.enableCORS=false", "--server.fileWatcherType=none"]
+
 
