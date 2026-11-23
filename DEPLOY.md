@@ -2,6 +2,8 @@
 
 The app needs two Python environments (Keras 3 + torch, and TensorFlow 2.10). The Dockerfile builds both inside one container, so the hosted site is a single link.
 
+Current live deployment (Azure Container Instances, port 8080): http://unified-ml-aditya.centralindia.azurecontainer.io:8080/
+
 ## Option A: Hugging Face Space (Docker)
 1. Create a free account at huggingface.co and make a new Space: SDK = Docker, template = Blank, hardware = CPU basic.
 2. Install Git LFS once: `git lfs install`
