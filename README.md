@@ -54,6 +54,22 @@ Weights are in the folders listed in `model_registry.py`. The voice model (about
 
 ## Tests
 ```
-pytest tests
+pip install pytest
+pytest
 ```
-Model-backed page tests need `TEST_FACE_IMAGE=<path to a face jpg>`.
+The suite runs offline in about a second and needs no model weights (they are stored in a private Hugging Face repository). By default `tests/conftest.py` swaps in a small stand-in for `model_registry`, so only the app's own logic is tested.
+
+| Test file | What it checks |
+|---|---|
+| `test_tracker.py` | Task 2: one person = one track, a visit closes after a gap, senior rule is strictly age > 60, median age |
+| `test_recorder.py` | Task 2: visit-log CSV header, timestamps, duration, Yes/No flag, ids continue after restart, no duplicate header |
+| `test_sign_language.py` | Task 4: 6:00 PM to 10:00 PM IST window (edges, UTC server clock, overnight wrap), model never runs when closed, word + confidence, "uncertain" result, video frame averaging and sampling |
+| `test_car_colour.py` | Task 5: box cropping, colour name, reliability rules for low confidence and tiny crops, bad boxes |
+| `test_worker_protocol_and_throttle.py` | TensorFlow worker data format round trip and the camera frame throttle |
+| `test_model_files.py` | Optional: every registered model file exists |
+
+To check the real model files, set a Hugging Face token and run:
+```
+$env:HF_TOKEN = "<your token>"; $env:USE_REAL_MODELS = "1"; pytest tests/test_model_files.py
+```
+The model-backed behaviour of Tasks 1, 3 and 6 (and the accuracy numbers above) is not covered by these automated tests. Check it by running the app on sample images and audio.

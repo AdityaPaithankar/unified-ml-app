@@ -1,8 +1,32 @@
+import os
+
 import av
+import requests
 import streamlit as st
 from streamlit_webrtc import VideoProcessorBase, webrtc_streamer
 
-RTC_CONFIGURATION = {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+_STUN_ONLY = [{"urls": ["stun:stun.l.google.com:19302"]}]
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _ice_servers():
+    """STUN plus a TURN relay from Metered. Keys come from environment variables,
+    never from the repository. Falls back to STUN only when they are not set."""
+    app = os.environ.get("METERED_APP")
+    key = os.environ.get("METERED_API_KEY")
+    if not app or not key:
+        return _STUN_ONLY
+    try:
+        reply = requests.get(
+            f"https://{app}.metered.live/api/v1/turn/credentials",
+            params={"apiKey": key},
+            timeout=10,
+        )
+        reply.raise_for_status()
+        servers = reply.json()
+        return servers or _STUN_ONLY
+    except Exception:
+        return _STUN_ONLY
 
 
 class _Processor(VideoProcessorBase):
@@ -32,7 +56,7 @@ def live_camera(key, make_stream):
         key=key,
         video_processor_factory=lambda: _Processor(make_stream),
         media_stream_constraints={"video": True, "audio": False},
-        rtc_configuration=RTC_CONFIGURATION,
+        rtc_configuration={"iceServers": _ice_servers()},
         async_processing=True,
     )
     processor = context.video_processor

@@ -1,6 +1,7 @@
 # Main environment (Keras 3, torch backend). Do not install TensorFlow here.
 streamlit>=1.40
 streamlit-webrtc
+requests
 av
 numpy
 Pillow>=10.0
